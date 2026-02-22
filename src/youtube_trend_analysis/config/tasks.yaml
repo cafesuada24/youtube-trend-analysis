@@ -1,0 +1,32 @@
+tasks:
+  - name: analysis_task
+    description: >
+      Conduct a fine-grained analysis of the transcripts of several videos located in {file_paths}. 
+      Break the analysis into the following sections:
+      1. Key topics and themes discussed in the videos.
+      2. Emerging trends or patterns across multiple videos.
+      3. Speaker sentiment and tone, noting any shifts.
+      4. Recurring keywords or phrases and their contexts.
+      Provide a detailed, structured report with insights for each section.
+    expected_output: >
+      A multi-section report containing:
+      1. Key topics and themes.
+      2. Emerging trends or patterns.
+      3. Speaker sentiment analysis.
+      4. Recurring keywords or phrases.
+      Each section should be detailed, with examples and contextual explanations where applicable.
+    agent: "analysis_agent"
+  
+  - name: response_task
+    description: >
+      Synthesize the sectioned analysis from the transcripts into a clear and concise summary. 
+      Ensure that the summary:
+      1. Provides a high-level overview of key findings in each section.
+      2. Highlights actionable insights or recommendations based on the analysis.
+      3. Maintains clarity, precision, and coherence in the language used.
+    expected_output: >
+      A concise summary including:
+      1. High-level findings from each section of the analysis.
+      2. Actionable insights or recommendations.
+      3. Clear and easy-to-understand language suitable for decision-making.
+    agent: "response_synthesizer_agent"
