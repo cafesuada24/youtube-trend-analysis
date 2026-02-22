@@ -1,4 +1,6 @@
-from crewai import Agent, Crew, Process, Task
+from collections.abc import Callable
+
+from crewai import LLM, Agent, Crew, Process, Task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai.project import CrewBase, agent, crew, task
 
@@ -11,19 +13,17 @@ class YoutubeTrendAnalysisCrew:
     agents: list[BaseAgent]
     tasks: list[Task]
 
+
     @agent
     def analysis_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['analysis_agent'],  # type: ignore[index]
-            verbose=True,
-            tools=[],
         )
 
     @agent
     def response_synthesizer_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['analysis_agent'],  # type: ignore[index]
-            verbose=True,
+            config=self.agents_config['response_synthesizer_agent'],  # type: ignore[index]
         )
 
     @task
