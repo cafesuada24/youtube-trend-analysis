@@ -3,11 +3,12 @@ import os
 import time
 
 import streamlit as st
-from crew import YoutubeTrendAnalysisCrew
 from dotenv import load_dotenv
+from tqdm import tqdm
+
+from crew import YoutubeTrendAnalysisCrew
 from scrappers.brightdata_scrapper import BrightDataScrapper
 from scrappers.scrapper import Scrapper
-from tqdm import tqdm
 
 load_dotenv()
 
@@ -78,20 +79,25 @@ def _start_analysis(scrapper: Scrapper) -> None:
                         video_idx = row * videos_per_rows + col_idx
                         if video_idx >= num_videos:
                             break
-                        cols[col_idx].video(
-                            channel_scrapped_output[video_idx]['url'],
-                        )
+
+                        if url := channel_scrapped_output[video_idx].get('url', None):
+                            cols[col_idx].video(url)
 
             status_container.info('Processing transcripts...')
             st.session_state.all_files = []
 
             for i in tqdm(range(len(channel_scrapped_output))):
                 curr_output = channel_scrapped_output[i]
-                youtube_video_id = curr_output['shortcode']
+
+                if (youtube_video_id := curr_output.get('shortcode', None)) is None:
+                    continue
 
                 os.makedirs('transcripts', exist_ok=True)
                 file = 'transcripts/' + youtube_video_id + '.txt'
                 st.session_state.all_files.append(file)
+
+                if not curr_output['formatted_transcript']:
+                    continue
 
                 with open(file, 'w') as f:
                     for trans in curr_output['formatted_transcript']:
@@ -100,10 +106,10 @@ def _start_analysis(scrapper: Scrapper) -> None:
                         end_time = trans['end_time']
                         f.write(f'({start_time:.2f}-{end_time:.2f}: {text}\n')
 
-                st.session_state.channel_scrapped_output = channel_scrapped_output
-                status_container.success(
-                    'Scraping complete! Generating trends report...',
-                )
+            st.session_state.channel_scrapped_output = channel_scrapped_output
+            status_container.success(
+                'Scraping complete! Generating trends report...',
+            )
 
         else:
             status_container.error(f'Scraping failed with status: {status}')
