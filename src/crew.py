@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 from crewai import LLM, Agent, Crew, Process, Task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai.project import CrewBase, agent, crew, task
@@ -29,13 +27,13 @@ class YoutubeTrendAnalysisCrew:
     @task
     def analysis_task(self) -> Task:
         return Task(
-            config=self.agents_config['analysis_task'],  # type: ignore[index]
+            config=self.tasks_config['analysis_task'],  # type: ignore[index]
         )
 
     @task
     def response_task(self) -> Task:
         return Task(
-            config=self.agents_config['response_task'],  # type: ignore[index]
+            config=self.tasks_config['response_task'],  # type: ignore[index]
         )
 
     @crew
