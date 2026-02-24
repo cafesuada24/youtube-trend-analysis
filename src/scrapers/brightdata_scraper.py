@@ -5,8 +5,10 @@ from typing import Literal
 
 
 class BrightDataScraper:
-    def __init__(self, api_key: str) -> None:
+    def __init__(self, api_key: str, dataset_id: str) -> None:
         self.__api_key = api_key
+        # self.__dataset_id = dataset_id
+        self.__endpoint =f'https://api.brightdata.com/datasets/v3/trigger?dataset_id={dataset_id}&include_errors=true&type=discover_new&discover_by=url'
 
     def scrape_channels(
         self,
@@ -17,8 +19,6 @@ class BrightDataScraper:
         order_by: str,
         country: str,
     ) -> None | dict:
-        dataset_id = 'gd_lk56epmy2i5g7lzu0k'
-        endpoint = f'https://api.brightdata.com/datasets/v3/trigger?dataset_id={dataset_id}&include_errors=true&type=discover_new&discover_by=url'
 
         payload = [
             {
@@ -41,7 +41,7 @@ class BrightDataScraper:
             'Content-Type: application/json',
             '-d',
             json.dumps(payload),  # Convert payload to JSON string
-            endpoint,
+            self.__endpoint,
         ]
 
         # Execute the command and capture the output
