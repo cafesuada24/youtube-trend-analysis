@@ -5,8 +5,8 @@ from crewai.project import CrewBase, agent, crew, task
 
 @CrewBase
 class YoutubeTrendAnalysisCrew:
-    agents_config = 'config/agents.yaml'
-    tasks_config = 'config/tasks.yaml'
+    agents_config = '../config/agents.yaml'
+    tasks_config = '../config/tasks.yaml'
 
     agents: list[BaseAgent]
     tasks: list[Task]
