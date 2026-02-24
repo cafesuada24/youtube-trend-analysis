@@ -3650,6 +3650,7 @@ dependencies = [
     { name = "crewai", extra = ["google-genai"] },
     { name = "crewai-tools" },
     { name = "ollama" },
+    { name = "pyyaml" },
     { name = "streamlit" },
 ]
 
@@ -3658,6 +3659,7 @@ requires-dist = [
     { name = "crewai", extras = ["google-genai"], specifier = ">=1.9.3" },
     { name = "crewai-tools", specifier = ">=1.9.3" },
     { name = "ollama", specifier = ">=0.6.1" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "streamlit", specifier = ">=1.54.0" },
 ]
 

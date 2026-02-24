@@ -9,6 +9,7 @@ dependencies = [
     "crewai-tools>=1.9.3",
     "ollama>=0.6.1",
     "streamlit>=1.54.0",
+    "pyyaml>=6.0.3",
 ]
 
 [tool.ruff]
