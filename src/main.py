@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 from crew import YoutubeTrendAnalysisCrew
-from scrappers.brightdata_scrapper import BrightDataScrapper
-from scrappers.scrapper import Scrapper
+from scrapers.brightdata_scraper import BrightDataScraper
+from scrapers.scraper import Scraper
 
 load_dotenv()
 
@@ -19,11 +19,11 @@ def reset_chat() -> None:
     gc.collect()
 
 
-def _start_analysis(scrapper: Scrapper) -> None:
+def _start_analysis(scraper: Scraper) -> None:
     with st.spinner('Scraping videos... This may take a moment.'):
         status_container = st.empty()
         status_container.info('Extracting videos from the channels...')
-        channel_snapshot_id = scrapper.scrape_channels(
+        channel_snapshot_id = scraper.scrape_channels(
             st.session_state.youtube_channels,
             10,
             st.session_state.start_date,
@@ -35,7 +35,7 @@ def _start_analysis(scrapper: Scrapper) -> None:
             status_container.error('Failed to create snapshot')
             return
 
-        status = scrapper.get_progress(channel_snapshot_id['snapshot_id'])
+        status = scraper.get_progress(channel_snapshot_id['snapshot_id'])
         if status is None:
             status_container.error('Failed to get snapshot snapshot status')
             return
@@ -43,7 +43,7 @@ def _start_analysis(scrapper: Scrapper) -> None:
         while status['status'] != 'ready':
             status_container.info(f'Current status: {status["status"]}')
             time.sleep(10)
-            status = scrapper.get_progress(channel_snapshot_id['snapshot_id'])
+            status = scraper.get_progress(channel_snapshot_id['snapshot_id'])
             if status is None:
                 status_container.error('Failed to get snapshot snapshot status')
                 return
@@ -55,7 +55,7 @@ def _start_analysis(scrapper: Scrapper) -> None:
         if status['status'] == 'ready':
             status_container.success('Scraping completed successfully!')
 
-            channel_scrapped_output = scrapper.get_output(
+            channel_scrapped_output = scraper.get_output(
                 status['snapshot_id'],
                 output_format='jsonl',
             )
@@ -123,7 +123,7 @@ def _start_analysis(scrapper: Scrapper) -> None:
             )
 
 
-def _render_sidebar_content(scrapper: Scrapper) -> None:
+def _render_sidebar_content(scraper: Scraper) -> None:
     st.header('Youtube Channels')
 
     if 'youtube_channels' not in st.session_state:
@@ -167,11 +167,11 @@ def _render_sidebar_content(scrapper: Scrapper) -> None:
 
     st.divider()
     st.button(
-        'Start Analysis 🚀', type='primary', on_click=_start_analysis, args=(scrapper,)
+        'Start Analysis 🚀', type='primary', on_click=_start_analysis, args=(scraper,)
     )
 
 
-def render_home_page(scrapper: Scrapper) -> None:
+def render_home_page(scraper: Scraper) -> None:
     """Start home page lifecycle."""
     st.markdown('# Youtube Trend Analysis')
     if 'messages' not in st.session_state:
@@ -184,7 +184,7 @@ def render_home_page(scrapper: Scrapper) -> None:
         st.session_state.crew = None
 
     with st.sidebar:
-        _render_sidebar_content(scrapper)
+        _render_sidebar_content(scraper)
 
     if st.session_state.response:
         with st.spinner('Generating content... This may take a moment.'):
@@ -207,5 +207,5 @@ def render_home_page(scrapper: Scrapper) -> None:
 
 
 if __name__ == '__main__':
-    scrapper = BrightDataScrapper(os.environ['BRIGHT_DATA_API_KEY'])
-    render_home_page(scrapper)
+    scraper = BrightDataScraper(os.environ['BRIGHT_DATA_API_KEY'])
+    render_home_page(scraper)

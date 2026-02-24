@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from typing import Literal, Protocol
 
 
-class Scrapper(Protocol):
+class Scraper(Protocol):
     def scrape_channels(
         self,
         channel_urls: Iterable[str],

@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from typing import Literal
 
 
-class BrightDataScrapper:
+class BrightDataScraper:
     def __init__(self, api_key: str) -> None:
         self.__api_key = api_key
 
