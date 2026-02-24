@@ -1,6 +1,7 @@
 import gc
 import os
 import time
+from pathlib import Path
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -9,8 +10,9 @@ from tqdm import tqdm
 from crew import YoutubeTrendAnalysisCrew
 from scrapers.brightdata_scraper import BrightDataScraper
 from scrapers.scraper import Scraper
+from src.config import AppConfig, load_app_config
 
-load_dotenv()
+CONFIG_FILE = 'config/config.yaml'
 
 
 def reset_chat() -> None:
@@ -19,7 +21,7 @@ def reset_chat() -> None:
     gc.collect()
 
 
-def _start_analysis(scraper: Scraper) -> None:
+def _start_analysis(scraper: Scraper, config: AppConfig) -> None:
     with st.spinner('Scraping videos... This may take a moment.'):
         status_container = st.empty()
         status_container.info('Extracting videos from the channels...')
@@ -92,14 +94,15 @@ def _start_analysis(scraper: Scraper) -> None:
                 if (youtube_video_id := curr_output.get('shortcode', None)) is None:
                     continue
 
-                os.makedirs('transcripts', exist_ok=True)
-                file = 'transcripts/' + youtube_video_id + '.txt'
+                transcripts_path = Path(config['path']['transcripts'])
+                transcripts_path.parent.mkdir(parents=True, exist_ok=True)
+                file = transcripts_path / f'{youtube_video_id}.txt'
                 st.session_state.all_files.append(file)
 
                 if not curr_output['formatted_transcript']:
                     continue
 
-                with open(file, 'w') as f:
+                with file.open() as f:
                     for trans in curr_output['formatted_transcript']:
                         text = trans['text']
                         start_time = trans['start_time']
@@ -123,7 +126,7 @@ def _start_analysis(scraper: Scraper) -> None:
             )
 
 
-def _render_sidebar_content(scraper: Scraper) -> None:
+def _render_sidebar_content(scraper: Scraper, config: AppConfig) -> None:
     st.header('Youtube Channels')
 
     if 'youtube_channels' not in st.session_state:
@@ -167,11 +170,14 @@ def _render_sidebar_content(scraper: Scraper) -> None:
 
     st.divider()
     st.button(
-        'Start Analysis 🚀', type='primary', on_click=_start_analysis, args=(scraper,)
+        'Start Analysis 🚀',
+        type='primary',
+        on_click=_start_analysis,
+        args=(scraper, config),
     )
 
 
-def render_home_page(scraper: Scraper) -> None:
+def render_home_page(scraper: Scraper, config: AppConfig) -> None:
     """Start home page lifecycle."""
     st.markdown('# Youtube Trend Analysis')
     if 'messages' not in st.session_state:
@@ -184,7 +190,7 @@ def render_home_page(scraper: Scraper) -> None:
         st.session_state.crew = None
 
     with st.sidebar:
-        _render_sidebar_content(scraper)
+        _render_sidebar_content(scraper, config)
 
     if st.session_state.response:
         with st.spinner('Generating content... This may take a moment.'):
@@ -207,5 +213,10 @@ def render_home_page(scraper: Scraper) -> None:
 
 
 if __name__ == '__main__':
-    scraper = BrightDataScraper(os.environ['BRIGHT_DATA_API_KEY'])
-    render_home_page(scraper)
+    load_dotenv()
+    config = load_app_config()
+    scraper = BrightDataScraper(
+        os.environ['BRIGHT_DATA_API_KEY'],
+        os.environ['BRIGHT_DATA_DATASET_ID'],
+    )
+    render_home_page(scraper, config)
